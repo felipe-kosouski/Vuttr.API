@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Vuttr.API.LoggerService;
 
 namespace Vuttr.API.Extensions
 {
@@ -12,5 +13,8 @@ namespace Vuttr.API.Extensions
                         .AllowAnyMethod()
                         .AllowAnyHeader());
             });
+
+        public static void ConfigureLoggerService(this IServiceCollection services) =>
+            services.AddScoped<ILoggerManager, LoggerManager>();
     }
 }
