@@ -1,0 +1,19 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP .NET Core service.
+version: '3.4'
+
+services:
+  vuttr:
+    image: vuttr
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: "your_password"
+    ports:
+      - "host_port:5432"
+    restart: always
