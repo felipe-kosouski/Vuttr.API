@@ -27,17 +27,9 @@ namespace Vuttr.API.Controllers
         [HttpGet]
         public IActionResult GetTools()
         {
-            try
-            {
-                var tools = _repository.Tool.GetAllTools(trackChanges: false);
-                var toolsDto = _mapper.Map<IEnumerable<ToolDto>>(tools);
-                return Ok(toolsDto);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            var tools = _repository.Tool.GetAllToolsAsync(trackChanges: false);
+            var toolsDto = _mapper.Map<IEnumerable<ToolDto>>(tools);
+            return Ok(toolsDto);
         }
     }
 }
