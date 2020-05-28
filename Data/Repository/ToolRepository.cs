@@ -32,7 +32,7 @@ namespace Vuttr.API.Data.Repository
 
         public void DeleteTool(Tool tool)
         {
-            Update(tool);
+            Delete(tool);
         }
     }
 }

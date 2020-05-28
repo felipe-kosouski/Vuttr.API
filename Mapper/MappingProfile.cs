@@ -10,6 +10,7 @@ namespace Vuttr.API.Mapper
         {
             CreateMap<Tool, ToolDto>().ReverseMap();
             CreateMap<ToolForCreationDto, Tool>();
+            CreateMap<ToolForUpdateDto, Tool>();
         }
     }
 }

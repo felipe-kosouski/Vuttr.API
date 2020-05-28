@@ -65,5 +65,43 @@ namespace Vuttr.API.Controllers
             var toolToReturn = _mapper.Map<ToolDto>(toolEntity);
             return CreatedAtRoute("ToolById", new {id = toolToReturn.Id}, toolToReturn);
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTool(Guid id, ToolForUpdateDto tool)
+        {
+            if (tool == null)
+            {
+                _logger.LogError("ToolForUpdateDto object sent from client is null");
+                return BadRequest("Tool object is null");
+            }
+            
+            var existentTool = await _repository.Tool.GetToolAsync(id, trackChanges: true);
+            if (existentTool == null)
+            {
+                _logger.LogInfo($"Tool with id: {id} does not exist in the database.");
+                return NotFound();
+            }
+
+            _mapper.Map(tool, existentTool);
+            await _repository.SaveAsync();
+
+            return NoContent();
+        }
+        
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTool(Guid id)
+        {
+            var tool = await _repository.Tool.GetToolAsync(id, trackChanges: false);
+            if (tool == null)
+            {
+                _logger.LogInfo($"Tool with id: {id} does not exist in the database.");
+                return NotFound();
+            }
+            
+            _repository.Tool.DeleteTool(tool);
+            await _repository.SaveAsync();
+            return NoContent();
+        }
     }
 }
