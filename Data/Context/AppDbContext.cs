@@ -12,14 +12,8 @@ namespace Vuttr.API.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new ToolConfiguration());
-            modelBuilder.ApplyConfiguration(new TagConfiguration());
-            modelBuilder.ApplyConfiguration(new ToolTagConfiguration());
         }
-
         public DbSet<Tool> Tools { get; set; }
-        public DbSet<Tag> Tags { get; set; }
-        public DbSet<ToolTag> ToolTags { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace Vuttr.API.Domain.Models
     {
         public Tool()
         {
+            Id = Guid.NewGuid();
             CreatedAt = DateTime.Now;
         }
         
@@ -19,7 +20,7 @@ namespace Vuttr.API.Domain.Models
         
         public string Link { get; set; }
         public string Description { get; set; }
-        public IList<ToolTag> ToolTags { get; set; }
+        public string[] Tags { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

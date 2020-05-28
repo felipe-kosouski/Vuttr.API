@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Vuttr.API.Data.Context;
 using Vuttr.API.Domain.Repository;
 
@@ -7,8 +8,7 @@ namespace Vuttr.API.Data.Repository
     {
         private AppDbContext _context;
         public IToolRepository _toolRepository;
-        public ITagRepository _tagRepository;
-        
+
         public RepositoryManager(AppDbContext context)
         {
             _context = context;
@@ -27,22 +27,9 @@ namespace Vuttr.API.Data.Repository
             }
         }
 
-        public ITagRepository Tag
+        public async Task SaveAsync()
         {
-            get
-            {
-                if (_tagRepository == null)
-                {
-                    _tagRepository = new TagRepository(_context);
-                }
-
-                return _tagRepository;
-            }
-        }
-
-        public void Save()
-        {
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }
