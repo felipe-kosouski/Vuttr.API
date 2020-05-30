@@ -4,3 +4,8 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 /.idea/*
+nlog.config
+/Logs/
+/.vscode/
+appsettings.json
+docker-compose.yml
