@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Vuttr.API.Data.Context;
 using Vuttr.API.Domain.Models;
 using Vuttr.API.Domain.Repository;
+using Vuttr.API.Domain.RequestFeatures;
 
 namespace Vuttr.API.Data.Repository
 {
@@ -15,9 +16,12 @@ namespace Vuttr.API.Data.Repository
         {
         }
         
-        public async Task< IEnumerable<Tool>> GetAllToolsAsync(bool trackChanges)
+        public async Task<PagedList<Tool>> GetAllToolsAsync(ToolParameters toolParameters, bool trackChanges)
         {
-            return await FindAll(trackChanges).OrderBy(tool => tool.Title).ToListAsync();
+            var tools = await FindAll(trackChanges)
+                .OrderBy(tool => tool.Title)
+                .ToListAsync();
+            return PagedList<Tool>.ToPagedList(tools, toolParameters.PageNumber, toolParameters.PageSize);
         }
 
         public async Task<Tool> GetToolAsync(Guid toolId, bool trackChanges)

@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Vuttr.API.ActionFilters;
 using Vuttr.API.Domain.DTO.Tool;
 using Vuttr.API.Domain.Models;
 using Vuttr.API.Domain.Repository;
+using Vuttr.API.Domain.RequestFeatures;
 using Vuttr.API.LoggerService;
 
 namespace Vuttr.API.Controllers
@@ -28,9 +30,10 @@ namespace Vuttr.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTools()
+        public async Task<IActionResult> GetTools([FromQuery] ToolParameters toolParameters)
         {
-            var tools = await _repository.Tool.GetAllToolsAsync(trackChanges: false);
+            var tools = await _repository.Tool.GetAllToolsAsync(toolParameters, trackChanges: false);
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(tools.MetaData));
             var toolsDto = _mapper.Map<IEnumerable<ToolDto>>(tools);
             return Ok(toolsDto);
         }
