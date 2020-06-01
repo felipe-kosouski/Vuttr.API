@@ -4,9 +4,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Vuttr.API.ActionFilters;
 using Vuttr.API.Domain.DTO.Tool;
 using Vuttr.API.Domain.Models;
 using Vuttr.API.Domain.Repository;
+using Vuttr.API.Domain.RequestFeatures;
 using Vuttr.API.LoggerService;
 
 namespace Vuttr.API.Controllers
@@ -27,37 +30,27 @@ namespace Vuttr.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTools()
+        public async Task<IActionResult> GetTools([FromQuery] ToolParameters toolParameters)
         {
-            var tools = await _repository.Tool.GetAllToolsAsync(trackChanges: false);
+            var tools = await _repository.Tool.GetAllToolsAsync(toolParameters, trackChanges: false);
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(tools.MetaData));
             var toolsDto = _mapper.Map<IEnumerable<ToolDto>>(tools);
             return Ok(toolsDto);
         }
 
         [HttpGet("{id}", Name = "ToolById")]
-        public async Task<IActionResult> GetTool(Guid id)
+        [ServiceFilter(typeof(ValidateToolExistsAttribute))]
+        public  IActionResult GetTool(Guid id)
         {
-            var tool = await _repository.Tool.GetToolAsync(id, trackChanges: false);
-            if (tool == null)
-            {
-                _logger.LogInfo($"Tool with id: {id} does not exist in the database.");
-                return NotFound();
-            }
-            else
-            {
-                var toolDto = _mapper.Map<ToolDto>(tool);
-                return Ok(toolDto);
-            }
+            var tool = HttpContext.Items["tool"] as Tool;
+            var toolDto = _mapper.Map<ToolDto>(tool);
+            return Ok(toolDto);
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateTool(ToolForCreationDto tool)
         {
-            if (tool == null)
-            {
-                _logger.LogError("ToolForCreationDto object sent from client is null");
-                return BadRequest("Tool object is null");
-            }
             var toolEntity = _mapper.Map<Tool>(tool);
             _repository.Tool.CreateTool(toolEntity);
             await _repository.SaveAsync();
@@ -67,20 +60,11 @@ namespace Vuttr.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ServiceFilter(typeof(ValidateToolExistsAttribute))]
         public async Task<IActionResult> UpdateTool(Guid id, ToolForUpdateDto tool)
         {
-            if (tool == null)
-            {
-                _logger.LogError("ToolForUpdateDto object sent from client is null");
-                return BadRequest("Tool object is null");
-            }
-            
-            var existentTool = await _repository.Tool.GetToolAsync(id, trackChanges: true);
-            if (existentTool == null)
-            {
-                _logger.LogInfo($"Tool with id: {id} does not exist in the database.");
-                return NotFound();
-            }
+            var existentTool = HttpContext.Items["tool"] as Tool;
 
             _mapper.Map(tool, existentTool);
             await _repository.SaveAsync();
@@ -90,14 +74,10 @@ namespace Vuttr.API.Controllers
         
 
         [HttpDelete("{id}")]
+        [ServiceFilter(typeof(ValidateToolExistsAttribute))]
         public async Task<IActionResult> DeleteTool(Guid id)
         {
-            var tool = await _repository.Tool.GetToolAsync(id, trackChanges: false);
-            if (tool == null)
-            {
-                _logger.LogInfo($"Tool with id: {id} does not exist in the database.");
-                return NotFound();
-            }
+            var tool = HttpContext.Items["tool"] as Tool;
             
             _repository.Tool.DeleteTool(tool);
             await _repository.SaveAsync();

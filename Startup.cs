@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
+using Vuttr.API.ActionFilters;
 using Vuttr.API.Data.Context;
 using Vuttr.API.Extensions;
 using Vuttr.API.LoggerService;
@@ -39,6 +40,12 @@ namespace Vuttr.API
             services.ConfigureSqlContext(Configuration);
             services.ConfigureRepositoryManager();
             services.AddAutoMapper(typeof(Startup));
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+            services.AddScoped<ValidationFilterAttribute>();
+            services.AddScoped<ValidateToolExistsAttribute>();
             services.AddControllers();
         }
 
