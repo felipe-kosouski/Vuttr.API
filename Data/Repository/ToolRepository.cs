@@ -18,9 +18,19 @@ namespace Vuttr.API.Data.Repository
         
         public async Task<PagedList<Tool>> GetAllToolsAsync(ToolParameters toolParameters, bool trackChanges)
         {
-            var tools = await FindAll(trackChanges)
-                .OrderBy(tool => tool.Title)
-                .ToListAsync();
+            List<Tool> tools;
+            if (toolParameters.Tag != null)
+            {
+                tools = await FindByCondition(tool => tool.Tags.Contains(toolParameters.Tag), trackChanges)
+                    .OrderBy(tool => tool.Title)
+                    .ToListAsync();
+            }
+            else
+            {
+                tools = await FindAll(trackChanges)
+                    .OrderBy(tool => tool.Title)
+                    .ToListAsync();
+            }
             return PagedList<Tool>.ToPagedList(tools, toolParameters.PageNumber, toolParameters.PageSize);
         }
 

@@ -17,9 +17,9 @@ namespace Vuttr.API.Data.Configuration
                     Link = "http://postgres.com",
                     Tags = new []
                     {
-                        "DB",
-                        "Postgre",
-                        "SQL"
+                        "db",
+                        "postgre",
+                        "sql"
                     }
 
                 },
@@ -30,9 +30,9 @@ namespace Vuttr.API.Data.Configuration
                     Link = "http://insomnia.com",
                     Tags = new []
                     {
-                        "HTTP",
-                        "Api",
-                        "REST"
+                        "http",
+                        "api",
+                        "rest"
                     }
                 }
             );

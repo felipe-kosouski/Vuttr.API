@@ -32,7 +32,7 @@ namespace Vuttr.API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTools([FromQuery] ToolParameters toolParameters)
         {
-            var tools = await _repository.Tool.GetAllToolsAsync(toolParameters, trackChanges: false);
+            var tools = await _repository.Tool.GetAllToolsAsync(toolParameters, false);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(tools.MetaData));
             var toolsDto = _mapper.Map<IEnumerable<ToolDto>>(tools);
             return Ok(toolsDto);
@@ -51,6 +51,10 @@ namespace Vuttr.API.Controllers
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateTool(ToolForCreationDto tool)
         {
+            for (int i = 0; i < tool.Tags.Length; i++)
+            {
+                tool.Tags[i] = tool.Tags[i].ToLower();
+            }
             var toolEntity = _mapper.Map<Tool>(tool);
             _repository.Tool.CreateTool(toolEntity);
             await _repository.SaveAsync();
