@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Vuttr.API.Domain.ErrorHandling
+namespace Vuttr.API.Models.ErrorHandling
 {
     public class ErrorDetails
     {

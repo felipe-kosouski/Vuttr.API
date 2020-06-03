@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using Vuttr.API.Domain.ErrorHandling;
+using Vuttr.API.Models.ErrorHandling;
 using Vuttr.API.LoggerService;
 
 namespace Vuttr.API.Extensions
