@@ -1,8 +1,11 @@
 using System;
+using System.IO;
+using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using Vuttr.API.Data.Context;
 using Vuttr.API.Data.Repository;
 using Vuttr.API.Domain.Repository;
@@ -54,5 +57,27 @@ namespace Vuttr.API.Extensions
         
         public static void ConfigureRepositoryManager(this IServiceCollection services) =>
             services.AddScoped<IRepositoryManager, RepositoryManager>();
+
+        public static void ConfigureSwagger(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Vuttr API", 
+                    Version = "v1",
+                    Description = "Vuttr API by Felipe Kosouski",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Felipe Kosouski",
+                        Email = "felipe.kosouski@gmail.com",
+                        Url = new Uri("https://www.linkedin.com/in/felipe-kosouski/"),
+                    }
+                });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"; 
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile); 
+                options.IncludeXmlComments(xmlPath);
+            });
+        }
     }
 }
