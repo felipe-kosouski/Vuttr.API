@@ -4,7 +4,8 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 /.idea/*
-/Logs/
 /.vscode/
 appsettings.json
 docker-compose.yml
+/Vuttr.Tests/bin/
+/Vuttr.API/Logs/
