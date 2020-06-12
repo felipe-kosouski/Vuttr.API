@@ -7,15 +7,15 @@ using Vuttr.API.Domain.Repository;
 
 namespace Vuttr.API.Data.Repository
 {
-    public class RepositoryBase<T> : IRepositoryBase<T> where T : class
+    public abstract class RepositoryBase
     {
-        protected AppDbContext _context;
+        protected readonly AppDbContext _context;
 
         public RepositoryBase(AppDbContext context)
         {
             _context = context;
         }
-        public IQueryable<T> FindAll(bool trackChanges)
+        /*public IQueryable<T> FindAll(bool trackChanges)
         {
             return !trackChanges ? _context.Set<T>().AsNoTracking() : _context.Set<T>();
         }
@@ -27,7 +27,7 @@ namespace Vuttr.API.Data.Repository
                 : _context.Set<T>().Where(expression);
         }
 
-        public void Create(T entity)
+        public void Save(T entity)
         {
             _context.Set<T>().Add(entity);
         }
@@ -40,6 +40,6 @@ namespace Vuttr.API.Data.Repository
         public void Delete(T entity)
         {
             _context.Set<T>().Remove(entity);
-        }
+        }*/
     }
 }

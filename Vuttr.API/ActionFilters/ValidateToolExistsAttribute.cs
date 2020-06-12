@@ -9,10 +9,10 @@ namespace Vuttr.API.ActionFilters
 {
     public class ValidateToolExistsAttribute : IAsyncActionFilter
     {
-        private readonly IRepositoryManager _repository;
+        private readonly IToolRepository _repository;
         private readonly ILoggerManager _logger;
 
-        public ValidateToolExistsAttribute(IRepositoryManager repository, ILoggerManager logger)
+        public ValidateToolExistsAttribute(IToolRepository repository, ILoggerManager logger)
         {
             _repository = repository;
             _logger = logger;
@@ -21,7 +21,7 @@ namespace Vuttr.API.ActionFilters
         {
             var trackChanges = context.HttpContext.Request.Method.Equals("PUT") ? true : false;
             var id = (Guid)context.ActionArguments["id"];
-            var tool = await _repository.Tool.GetToolAsync(id, trackChanges);
+            var tool = await _repository.GetToolAsync(id, trackChanges);
             if (tool == null) 
             {
                 _logger.LogInfo($"Tool with id: {id} doesn't exist in the database.");
