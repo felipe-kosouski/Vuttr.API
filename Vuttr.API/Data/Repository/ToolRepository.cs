@@ -10,7 +10,7 @@ using Vuttr.API.Domain.RequestFeatures;
 
 namespace Vuttr.API.Data.Repository
 {
-    public class ToolRepository : RepositoryBase<Tool>, IToolRepository
+    public class ToolRepository : RepositoryBase, IToolRepository
     {
         public ToolRepository(AppDbContext context) : base(context)
         {
@@ -21,32 +21,37 @@ namespace Vuttr.API.Data.Repository
             List<Tool> tools;
             if (toolParameters.Tag != null)
             {
-                tools = await FindByCondition(tool => tool.Tags.Contains(toolParameters.Tag), trackChanges)
-                    .OrderBy(tool => tool.Title)
-                    .ToListAsync();
+                tools = await (!trackChanges
+                    ? _context.Tools.Where(tool => tool.Tags.Contains(toolParameters.Tag)).AsNoTracking()
+                        .OrderBy(tool => tool.Title)
+                        .ToListAsync()
+                    : _context.Tools.Where(tool => tool.Tags.Contains(toolParameters.Tag)).OrderBy(tool => tool.Title)
+                        .ToListAsync());
             }
             else
             {
-                tools = await FindAll(trackChanges)
-                    .OrderBy(tool => tool.Title)
-                    .ToListAsync();
+                tools = await (!trackChanges
+                    ? _context.Tools.OrderBy(tool => tool.Title).ToListAsync()
+                    : _context.Tools.OrderBy(tool => tool.Title).ToListAsync());
             }
             return PagedList<Tool>.ToPagedList(tools, toolParameters.PageNumber, toolParameters.PageSize);
         }
 
         public async Task<Tool> GetToolAsync(Guid toolId, bool trackChanges)
         {
-            return await FindByCondition(tool => tool.Id.Equals(toolId), trackChanges).SingleOrDefaultAsync();
+            return await (!trackChanges
+                ? _context.Tools.AsNoTracking().FirstOrDefaultAsync(tool => tool.Id.Equals(toolId))
+                : _context.Tools.FirstOrDefaultAsync(tool => tool.Id.Equals(toolId)));
         }
 
         public void CreateTool(Tool tool)
         {
-            Create(tool);
+            _context.Tools.AddAsync(tool);
         }
 
         public void DeleteTool(Tool tool)
         {
-            Delete(tool);
+            _context.Tools.Remove(tool);
         }
     }
 }

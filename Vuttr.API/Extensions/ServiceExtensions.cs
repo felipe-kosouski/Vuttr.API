@@ -2,12 +2,14 @@ using System;
 using System.IO;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Vuttr.API.Data.Context;
 using Vuttr.API.Data.Repository;
+using Vuttr.API.Domain.Models;
 using Vuttr.API.Domain.Repository;
 using Vuttr.API.LoggerService;
 
@@ -54,9 +56,12 @@ namespace Vuttr.API.Extensions
                 }
                 options.UseNpgsql(connectionString);
             });
-        
-        public static void ConfigureRepositoryManager(this IServiceCollection services) =>
-            services.AddScoped<IRepositoryManager, RepositoryManager>();
+
+        public static void ConfigureRepositoryManager(this IServiceCollection services)
+        {
+            services.AddScoped<IToolRepository, ToolRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+        }
 
         public static void ConfigureSwagger(this IServiceCollection services)
         {
@@ -78,6 +83,22 @@ namespace Vuttr.API.Extensions
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile); 
                 options.IncludeXmlComments(xmlPath);
             });
+        }
+
+        public static void ConfigureIdentity(this IServiceCollection services)
+        {
+            var builder = services.AddIdentityCore<User>(options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = false; 
+                options.Password.RequireUppercase = false; 
+                options.Password.RequireNonAlphanumeric = false; 
+                options.Password.RequiredLength = 10; 
+                options.User.RequireUniqueEmail = true;
+            });
+            
+            builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
+            builder.AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
         }
     }
 }

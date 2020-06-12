@@ -41,6 +41,8 @@ namespace Vuttr.API
             services.AddScoped<ValidationFilterAttribute>();
             services.AddScoped<ValidateToolExistsAttribute>();
             services.ConfigureSwagger();
+            services.AddAuthentication();
+            services.ConfigureIdentity();
             services.AddControllers();
             
         }
@@ -69,7 +71,7 @@ namespace Vuttr.API
             });
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

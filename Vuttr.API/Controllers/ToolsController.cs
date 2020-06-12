@@ -20,15 +20,17 @@ namespace Vuttr.API.Controllers
     [ApiController]
     public class ToolsController : ControllerBase
     {
-        private readonly IRepositoryManager _repository;
+        private readonly IToolRepository _repository;
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
         
-        public ToolsController(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
+        public ToolsController(IToolRepository repository, ILoggerManager logger, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _repository = repository;
             _logger = logger;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
         
         /// <summary>
@@ -41,7 +43,7 @@ namespace Vuttr.API.Controllers
         [ProducesResponseType(200)] 
         public async Task<IActionResult> GetTools([FromQuery] ToolParameters toolParameters)
         {
-            var tools = await _repository.Tool.GetAllToolsAsync(toolParameters, false);
+            var tools = await _repository.GetAllToolsAsync(toolParameters, false);
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(tools.MetaData));
             var toolsDto = _mapper.Map<IEnumerable<ToolDto>>(tools);
             return Ok(toolsDto);
@@ -58,7 +60,7 @@ namespace Vuttr.API.Controllers
         [ProducesResponseType(200)] 
         [ProducesResponseType(404)] 
         [ServiceFilter(typeof(ValidateToolExistsAttribute))]
-        public  IActionResult GetTool(Guid id)
+        public IActionResult GetTool(Guid id)
         {
             var tool = HttpContext.Items["tool"] as Tool;
             var toolDto = _mapper.Map<ToolDto>(tool);
@@ -85,8 +87,8 @@ namespace Vuttr.API.Controllers
                 tool.Tags[i] = tool.Tags[i].ToLower();
             }
             var toolEntity = _mapper.Map<Tool>(tool);
-            _repository.Tool.CreateTool(toolEntity);
-            await _repository.SaveAsync();
+            _repository.CreateTool(toolEntity);
+            await _unitOfWork.SaveChanges();
 
             var toolToReturn = _mapper.Map<ToolDto>(toolEntity);
             return CreatedAtRoute("ToolById", new {id = toolToReturn.Id}, toolToReturn);
@@ -112,7 +114,7 @@ namespace Vuttr.API.Controllers
             var existentTool = HttpContext.Items["tool"] as Tool;
 
             _mapper.Map(tool, existentTool);
-            await _repository.SaveAsync();
+            await _unitOfWork.SaveChanges();
 
             return NoContent();
         }
@@ -132,8 +134,8 @@ namespace Vuttr.API.Controllers
         {
             var tool = HttpContext.Items["tool"] as Tool;
             
-            _repository.Tool.DeleteTool(tool);
-            await _repository.SaveAsync();
+            _repository.DeleteTool(tool);
+            await _unitOfWork.SaveChanges();
             return NoContent();
         }
     }

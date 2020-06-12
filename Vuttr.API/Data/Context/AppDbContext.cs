@@ -1,10 +1,11 @@
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Vuttr.API.Data.Configuration;
 using Vuttr.API.Domain.Models;
 
 namespace Vuttr.API.Data.Context
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<User>
     {
         public AppDbContext(DbContextOptions options) : base(options)
         {
@@ -12,6 +13,7 @@ namespace Vuttr.API.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new ToolConfiguration());
         }
         public DbSet<Tool> Tools { get; set; }
