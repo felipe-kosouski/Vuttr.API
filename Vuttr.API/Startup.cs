@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Vuttr.API.ActionFilters;
+using Vuttr.API.Authentication;
 using Vuttr.API.Data.Context;
 using Vuttr.API.Extensions;
 using Vuttr.API.LoggerService;
@@ -43,8 +44,9 @@ namespace Vuttr.API
             services.ConfigureSwagger();
             services.AddAuthentication();
             services.ConfigureIdentity();
+            services.ConfigureJwt(Configuration);
+            services.AddScoped<IAuthenticationManager, AuthenticationManager>();
             services.AddControllers();
-            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

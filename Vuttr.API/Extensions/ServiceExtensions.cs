@@ -1,11 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Vuttr.API.Data.Context;
 using Vuttr.API.Data.Repository;
@@ -82,6 +86,28 @@ namespace Vuttr.API.Extensions
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"; 
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile); 
                 options.IncludeXmlComments(xmlPath);
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme 
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Place to add JWT with Bearer", Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference 
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer" 
+                            },
+                            Name = "Bearer",
+                        },
+                        new List<string>()
+                    }
+                });
             });
         }
 
@@ -99,6 +125,34 @@ namespace Vuttr.API.Extensions
             
             builder = new IdentityBuilder(builder.UserType, typeof(IdentityRole), builder.Services);
             builder.AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+        }
+
+        public static void ConfigureJwt(this IServiceCollection services, IConfiguration configuration)
+        {
+            var validIssuer = Environment.GetEnvironmentVariable("VALID_ISSUER");
+            var validAudience = Environment.GetEnvironmentVariable("VALID_AUDIENCE");
+            var secretKey = Environment.GetEnvironmentVariable("SECRET");
+            
+            services.AddAuthentication(opt => 
+                {
+                    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; 
+                    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options => 
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters 
+                    {
+                        ValidateIssuer = true, 
+                        ValidateAudience = true, 
+                        ValidateLifetime = true, 
+                        ValidateIssuerSigningKey = true,
+                        
+                        ValidIssuer = validIssuer, 
+                        ValidAudience = validAudience, 
+                        IssuerSigningKey = new
+                            SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) 
+                    };
+                });
         }
     }
 }

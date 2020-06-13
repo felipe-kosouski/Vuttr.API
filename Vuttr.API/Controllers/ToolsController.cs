@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -39,7 +40,7 @@ namespace Vuttr.API.Controllers
         /// <param name="toolParameters"></param>
         /// <returns>The tools list</returns>
         /// <response code="200">Returns the list of tools</response>
-        [HttpGet]
+        [HttpGet, Authorize]
         [ProducesResponseType(200)] 
         public async Task<IActionResult> GetTools([FromQuery] ToolParameters toolParameters)
         {
@@ -56,7 +57,7 @@ namespace Vuttr.API.Controllers
         /// <returns>The tool specified by the Id in request</returns>
         /// <response code="200">Returns the tool</response>
         /// <response code="404">If the tool was not found</response>
-        [HttpGet("{id}", Name = "ToolById")]
+        [HttpGet("{id}", Name = "ToolById"), Authorize]
         [ProducesResponseType(200)] 
         [ProducesResponseType(404)] 
         [ServiceFilter(typeof(ValidateToolExistsAttribute))]
@@ -75,7 +76,7 @@ namespace Vuttr.API.Controllers
         /// <response code="201">Returns the newly created tool</response>
         /// <response code="400">If the item is null</response>
         /// <response code="422">If the model is invalid</response>
-        [HttpPost]
+        [HttpPost, Authorize]
         [ProducesResponseType(201)] 
         [ProducesResponseType(400)] 
         [ProducesResponseType(422)]
@@ -103,7 +104,7 @@ namespace Vuttr.API.Controllers
         /// <response code="204">Returns no content</response>
         /// <response code="400">If the item is null</response>
         /// <response code="404">If the tool was not found</response>
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -126,7 +127,7 @@ namespace Vuttr.API.Controllers
         /// <returns>Returns no content</returns>
         /// <response code="204">Returns no content</response>
         /// <response code="404">If the tool was not found</response>
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize]
         [ProducesResponseType(204)]
         [ProducesResponseType(404)]
         [ServiceFilter(typeof(ValidateToolExistsAttribute))]
