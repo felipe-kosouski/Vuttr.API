@@ -30,5 +30,9 @@
       <Compile Remove="Domain\Services\IBaseService.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="docker-compose.yml" />
+    </ItemGroup>
+
 
 </Project>

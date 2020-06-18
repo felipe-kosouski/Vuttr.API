@@ -3,12 +3,18 @@ version: '3.4'
 
 services:
   vuttr:
-    image: vuttr
-    build:
-      context: .
+    image: felipekosouski/vuttr_api
+    build: 
+      context: ./Vuttr.API
       dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      VALID_AUDIENCE: "https://localhost:80"
+      VALID_ISSUER: "VuttrAPI"
+      JWT_EXPIRES: "60"
+      SECRET: "VuttrAPISecretKey"
     ports:
-      - 3000
+      - "3000:80"
 
   postgres:
     image: postgres
